@@ -1,4 +1,4 @@
-package competitiveprogramming.chapter3.backtracking.sample.queens8;
+package competitiveprogramming.chapter3.backtracking.easier.queen;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
