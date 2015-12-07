@@ -58,7 +58,7 @@ public class Main {
 				}
 				if (!ableToReachNextStation(i, currentGas, currentDis)) {
 					cost += (capacity - currentGas) * stationList.get(i).price;
-					cost += 2.00;
+					cost += 200;
 					currentGas = capacity;
 					solve(currentStationNum + 1,
 							currentGas - (stationList.get(i).dist - currentDis) / consume,
@@ -73,7 +73,7 @@ public class Main {
 				
 				//buy
 				cost += (capacity - currentGas) * stationList.get(i).price;
-				cost += 2.00;
+				cost += 200;
 				currentGas = capacity;
 				solve(currentStationNum + 1,
 						currentGas - (stationList.get(i).dist - currentDis) / consume,
@@ -90,13 +90,12 @@ public class Main {
 				break;
 			}
 
-			cost = 0;
 			StringTokenizer st = new StringTokenizer(str);
 			distance = Float.parseFloat(st.nextToken());
 			st = new StringTokenizer(br.readLine());
 			capacity = Float.parseFloat(st.nextToken());
 			consume = Float.parseFloat(st.nextToken());
-			cost += Float.parseFloat(st.nextToken());
+			cost = Float.parseFloat(st.nextToken()) * 100;
 			number = Integer.parseInt(st.nextToken());
 
 			stationList = new ArrayList<>();
@@ -110,8 +109,8 @@ public class Main {
 				stationList.add(station);
 			}
 			solve(0, capacity, 0f);
-			pw.printf("Data Set #%d", valueOf(counter));
-			pw.printf("  minimum cost = %f\n", Float.valueOf(minCost));
+			pw.printf("Data Set #%d\n", valueOf(counter));
+			pw.printf("  minimum cost = $%.2f\n", Float.valueOf(minCost / 100));
 		}
 		br.close();
 		pw.flush();
