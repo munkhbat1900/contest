@@ -38,43 +38,37 @@ public class Main {
 	}
 
 	static boolean ableToReachNextStation(int stationNum, double currentDis, double currentGas) {
-		if (stationList.get(stationNum).dist - currentDis / consume <= currentGas) {
+		if ((stationList.get(stationNum).dist - currentDis) / consume <= currentGas) {
 			return true;
 		}
 		return false;
 	}
 
-	static void solve(int currentStationNum, double currentGas, double currentDis) {
+	static void solve(int nextStation, double currentGas, double currentDis) {
 		if (hasReachedGoal(currentDis, currentGas)) {
 			minCost = Math.min(minCost, cost);
 			return;
+		} else if (nextStation >= number) {
+			return;
 		} else {
-			for (int i = currentStationNum + 1; i < stationList.size(); i++) {
-				double gasUse = (stationList.get(i).dist - currentDis) / consume;
-				// can't reach
-				if (capacity - gasUse < 0) {
-					break;
-				}
-				if (ableToReachNextStation(i, currentDis, currentGas) && currentGas > capacity / 2) {
-					solve(currentStationNum + 1, currentGas - gasUse, stationList.get(i).dist);
-					continue;
-				}
-				if (!ableToReachNextStation(i, currentGas, currentDis)) {
-					cost += (capacity - currentGas) * stationList.get(i).price;
-					cost += 200;
-					currentGas = capacity;
-					solve(currentStationNum + 1, currentGas - gasUse, stationList.get(i).dist);
-					continue;
-				}
-				
-				// don't buy
-				solve(i, currentGas - gasUse, stationList.get(i).dist);
-				
-				//buy
-				cost += (capacity - currentGas) * stationList.get(i).price;
-				cost += 200;
+			double gasUse = (stationList.get(nextStation).dist - currentDis) / consume;
+			if (ableToReachNextStation(nextStation, currentDis, currentGas) && currentGas > capacity / 2) {
+				solve(nextStation + 1, currentGas - gasUse, stationList.get(nextStation).dist);
+			} else if (!ableToReachNextStation(nextStation, currentDis, currentGas)) {
+				cost += 200 + (capacity - currentGas) * stationList.get(nextStation - 1).price;
 				currentGas = capacity;
-				solve(currentStationNum + 1, currentGas - gasUse, stationList.get(i).dist);
+				solve(nextStation + 1, currentGas - gasUse, stationList.get(nextStation).dist);
+			} else {
+				//buy
+				double tmpCost = cost;
+				cost += 200 + (capacity - currentGas) * stationList.get(nextStation - 1).price;
+				double tmpGas = currentGas;
+				currentGas = capacity;
+				solve(nextStation + 1, currentGas - gasUse, stationList.get(nextStation).dist);
+				cost = tmpCost;
+				currentGas = tmpGas;
+				// don't buy
+				solve(nextStation + 1, currentGas - gasUse, stationList.get(nextStation).dist);
 			}
 		}
 	}
@@ -108,6 +102,7 @@ public class Main {
 			solve(0, capacity, 0f);
 			pw.printf("Data Set #%d\n", valueOf(counter));
 			pw.printf("  minimum cost = $%.2f\n", Double.valueOf(minCost / 100));
+			counter++;
 		}
 		br.close();
 		pw.flush();
