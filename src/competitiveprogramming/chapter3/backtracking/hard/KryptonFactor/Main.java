@@ -43,10 +43,10 @@ public class Main {
 	}
 	
 	static void solve(int len, char[] seq) {
-//		for (int i = 0; i < len; i++) {
-//			pw.print(seq[i]);
-//		}
-//		pw.println();
+		for (int i = 0; i < len; i++) {
+			pw.print(seq[i]);
+		}
+		pw.println();
 		if (count == n && !found) {
 			found = true;
 			int c = 1;
