@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 /**
@@ -16,45 +17,65 @@ import java.util.StringTokenizer;
 public class Main {
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	static PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));
-	
+
 	static int n, s;
-	static int[][] dp;
-	
+	static long[][][] bottomup, topdown;
+
 	static void bottomup() {
-		
-	}
-	
-	static int countSecure(boolean[] locked) {
-		int count = 0;
-		for (int i = 0; i < n; i++) {
-			if (locked[i] && (i == 0 || locked[i - 1])) {
-				count++;
+		// think of drawer as stack.
+		// if we put an unlocked drawer on top of unlocked drawer, the number of secure drawer doesn'change
+		// if we put an unlocked drawer on top of locked drawer, the number of secure drawer decreases by 1 
+		// if we put an locked drawer on top of locked drawer, the number of secure drawer increases by 1.
+		// if we put an locked drawer on top of unlocked drawer, the number of secure drawer increases by 1.
+		// top drawer dp[i][j][k] : i th drawer, j secure,
+		bottomup[1][1][1] = 1;bottomup[1][0][0] = 1;
+		for (int i = 2; i < 66; i++) {
+			for (int j = 0; j <= i; j++) {
+				if (j > 0) {
+					bottomup[i][j][1] = bottomup[i - 1][j - 1][1] + bottomup[i - 1][j - 1][0];
+				}
+				bottomup[i][j][0] = bottomup[i - 1][j][0] + bottomup[i - 1][j + 1][1];
 			}
 		}
-		return count;
 	}
-	
-	static int solve(boolean[] locked) {
-		int count = countSecure(locked);
-		if (count == s) {
-			return 1;
-		}
-		if (count > s) {
+
+	/**
+	 * @param id
+	 * @param lockCount
+	 * @param isLocked represents one above drawer locked or not
+	 * @return
+	 */
+	static long topdown(int id, int lockCount, int isLocked) {
+		if (id < 0 || lockCount < 0) {
 			return 0;
 		}
-		count = 0;
-		for (int i = 0; i < n; i++) {
-			if (locked[i]) {
-				continue;
-			}
-			locked[i] = true;
-			count += solve(locked);
-			locked[i] = false;
+		if (id == 0 && lockCount == 0) {
+			return 1;
 		}
-		return count;
+		if (topdown[id][lockCount][isLocked] != -1) {
+			return topdown[id][lockCount][isLocked];
+		}
+		long count = 0;
+		if (isLocked == 1) {
+			count += topdown(id - 1, lockCount - 1, 1);
+			count += topdown(id - 1, lockCount, 0);
+		} else {
+			count += topdown(id - 1, lockCount, 1);
+			count += topdown(id - 1, lockCount, 0);
+		}
+
+		return topdown[id][lockCount][isLocked] = count;
 	}
-	
+
 	public static void main(String[] args) throws IOException {
+		//		topdown = new long[66][66][2];
+		//		for (int i = 0; i < 66; i++) {
+		//			for (int j = 0; j < 66; j++) {
+		//				Arrays.fill(topdown[i][j], -1);
+		//			}
+		//		}
+		bottomup = new long[66][67][2];
+		bottomup();
 		while (true) {
 			StringTokenizer st = new StringTokenizer(br.readLine());
 			n = Integer.parseInt(st.nextToken());
@@ -62,7 +83,8 @@ public class Main {
 			if (n < 0 && s < 0) {
 				break;
 			}
-			pw.println(solve(new boolean[n]));
+			//			pw.println(topdown(n, s, 1));
+			pw.println(bottomup[n][s][0] + bottomup[n][s][1]);
 		}
 		br.close();
 		pw.flush();
