@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * @author munkhbat
  * UVA 10261 - Ferry Loading
+ * topdown got AC in 0.400 secs
  */
 public class Main {
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -20,7 +21,7 @@ public class Main {
 	static int totalLen, currLen, sum = 0;
 	static List<Integer> cars;
 	static int[][] topDown;
-	static boolean[] load;
+	static int[][] load;
 
 	/**
 	 * true if car can be loaded on port side
@@ -54,16 +55,14 @@ public class Main {
 			int res = topdown(id + 1, reml - cars.get(id).intValue());
 			if (res > topDown[id][reml]) {
 				topDown[id][reml] = res;
-//				load[id] = true;
-//				pw.println(id + " = " + true);
+				load[id][reml] = reml - cars.get(id).intValue();
 			}
 		}
 		if (remR >= cars.get(id).intValue()) {
 			int res = topdown(id + 1, reml);
 			if (res > topDown[id][reml]) {
 				topDown[id][reml] = res;
-//				load[id] = false;
-//				pw.println(id + " = " + false);
+				load[id][reml] = reml;
 			}
 		}
 		return topDown[id][reml];
@@ -73,16 +72,12 @@ public class Main {
 		if (id >= ans) {
 			return;
 		}
-		for (int i = 0; i <= totalLen; i++) {
-			if (topDown[id + 1][i] == ans) {
-				if (i == reml) {
-					printSol(id + 1, reml, ans);
-					load[id] = false;
-				} else {
-					printSol(id + 1, reml - cars.get(id).intValue(), ans);
-					load[id] = true;
-				}
-			}
+		if (load[id][reml] == reml) {
+			pw.println("starboard");
+			printSol(id + 1, reml, ans);
+		} else if (load[id][reml] == reml - cars.get(id).intValue()) {
+			pw.println("port");
+			printSol(id + 1, reml - cars.get(id).intValue(), ans);
 		}
 	}
 
@@ -107,21 +102,14 @@ public class Main {
 				sum += currLen;
 			}
 			topDown = new int[cars.size()][totalLen + 1];
-			load = new boolean[cars.size()];
-			Arrays.fill(load, false);
+			load = new int[cars.size()][totalLen + 1];
 			for (int i = 0; i < cars.size(); i++) {
 				Arrays.fill(topDown[i], -1);
+				Arrays.fill(load[i], -1);
 			}
 			int ans = topdown(0, totalLen);
 			pw.println(ans);
 			printSol(0, totalLen, ans);
-			for (int i = 0; i < ans; i++) {
-				if (load[i]) {
-					pw.println("port");
-				} else {
-					pw.println("starboard");
-				}
-			}
 			counter++;
 			t--;
 		}
