@@ -74,11 +74,11 @@ public class Main {
 			return;
 		}
 		for (int i = 0; i <= totalLen; i++) {
-			if (topDown[id][i] == 6) {
+			if (topDown[id + 1][i] == ans) {
 				if (i == reml) {
 					printSol(id + 1, reml, ans);
 					load[id] = false;
-				} else if (i == reml - cars.get(id).intValue()) {
+				} else {
 					printSol(id + 1, reml - cars.get(id).intValue(), ans);
 					load[id] = true;
 				}
